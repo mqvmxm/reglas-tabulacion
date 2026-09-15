@@ -53,7 +53,7 @@ def construir_clausula(columna_principal):
             cascada_final.append(regla)
 
     return ", ".join(cascada_final)
-#Es un controlador capturalo que el usario manda por la url y le asigna un id aleatorio, despues se le asigna un id por defecto 
+#Es un controlador capturalo que el usario manda por la url y le asigna un id aleatorio. 
 class Index:
     def GET(self):
         user_input = web.input(sort='id')
