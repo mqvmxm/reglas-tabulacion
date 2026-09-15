@@ -1,10 +1,10 @@
 import sqlite3
 
-
+#Inializa o habilita la comunicacion con la bd y si no existe la crea, cursor es el intermediario y evia instrucciones como crear insertar, borrar
 def crear_bd():
     conexion = sqlite3.connect('artistas.db')
     cursor = conexion.cursor()
-
+#
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS artistas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

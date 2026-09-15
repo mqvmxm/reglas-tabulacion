@@ -53,25 +53,24 @@ def construir_clausula(columna_principal):
             cascada_final.append(regla)
 
     return ", ".join(cascada_final)
-
-
+#Es un controlador capturalo que el usario manda por la url y le asigna un id aleatorio, despues se le asigna un id por defecto 
 class Index:
     def GET(self):
         user_input = web.input(sort='id')
         columna_principal = user_input.sort
-
+#se valida la entrada y hace la consulta permitida
         if columna_principal not in COLUMNAS_VALIDAS:
             columna_principal = 'id'
-
+#Reglas de negocio para el desempate 
         clausula_sql = construir_clausula(columna_principal)
         query = f"SELECT * FROM artistas ORDER BY {clausula_sql}"
-
+#Abre la conexion con bd, recupera los datos y cierra la conexion 
         conexion = conectar()
         cursor = conexion.cursor()
         cursor.execute(query)
         artistas = cursor.fetchall()
         conexion.close()
-
+#Pasa los datos recuperados para la interfaz grafica
         return render.index(artistas=artistas, query_usada=query)
 
     def POST(self):
