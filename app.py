@@ -54,11 +54,12 @@ def construir_clausula(columna_principal):
         if nombre_columna not in [r.split()[0] for r in cascada_final]: 
             cascada_final.append(regla)
 
-    return ", ".join(cascada_final)
+    return ", ".join(cascada_final) # al final lo que hace es no tener 2 reglas al mismo tiempo
+
 #Es un controlador capturalo que el usario manda por la url y le asigna un id aleatorio. 
 class Index:
     def GET(self):
-        user_input = web.input(sort='id')
+        user_input = web.input(sort='id') # captura los parametros y se le define un valor por defecto para que al iniciar no existan fallos
         columna_principal = user_input.sort
 #se valida la entrada y hace la consulta permitida
         if columna_principal not in COLUMNAS_VALIDAS:
@@ -76,35 +77,35 @@ class Index:
         return render.index(artistas=artistas, query_usada=query)
 
     def POST(self):
-        datos = web.input()
+        datos = web.input() # recolecta la información que el usuario escribió
 
-        conexion = conectar()
-        cursor = conexion.cursor()
+        conexion = conectar() # conectamos a nuestro archivo db y creamos un cursor 
+        cursor = conexion.cursor() # para ejecutar las consultas SQL
         cursor.execute('''
             INSERT INTO artistas
                 (nombre, pais, genero, streams_anuales, ano_debut, premios_grammy, puesto_ranking)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            datos.nombre.strip(),
+            VALUES (?, ?, ?, ?, ?, ?, ?)  
+        ''', (  # orden para insertar un nuevo registro
+            datos.nombre.strip(),  #.strip borra espacios accidentales al inicio o al final
             datos.pais.strip(),
             datos.genero.strip(),
-            int(datos.streams_anuales),
+            int(datos.streams_anuales), # int para convertirlos a numeros enteros 
             int(datos.ano_debut),
             int(datos.premios_grammy),
             int(datos.puesto_ranking)
         ))
-        conexion.commit()
+        conexion.commit() 
         conexion.close()
 
-        web.header('Location', '/')
-        web.ctx.status = '303 See Other'
+        web.header('Location', '/')  # redirige a la pagina principal 
+        web.ctx.status = '303 See Other' # evitamos datos duplicados
         return ''
 
 class Borrar:
     def GET(self, id_artista):
         conexion = conectar()
         cursor = conexion.cursor()
-        cursor.execute('DELETE FROM artistas WHERE id = ?', (id_artista,))
+        cursor.execute('DELETE FROM artistas WHERE id = ?', (id_artista,)) # ejecuta el borrar unicamente en el registro donde coincide el ID
         conexion.commit()
         conexion.close()
 
@@ -113,5 +114,5 @@ class Borrar:
         return ''
 
 
-if __name__ == "__main__":
-    app.run()
+if __name__ == "__main__": #verificamos que lo estemos corriendo directamente
+    app.run() # enciende el servidor web local
