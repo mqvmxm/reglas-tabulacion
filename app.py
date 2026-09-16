@@ -1,19 +1,20 @@
 import web
 import sqlite3
 
-urls = (
+urls = (   #Definición de las rutas del sistema
     '/', 'Index',
-    r'/borrar/(\d+)', 'Borrar'
+    r'/borrar/(\d+)', 'Borrar' # captura el ID para cuando se va a borrar
 )
 
+# inicialización del sistema y plantillas 
 app = web.application(urls, globals())
 render = web.template.render('templates/')
 
-DB = 'artistas.db'
+DB = 'artistas.db' # nombre de la base de datos 
 
 
 def conectar():
-    conexion = sqlite3.connect(DB)
+    conexion = sqlite3.connect(DB) #establece y devuelve una conexión a la base de datos
     conexion.row_factory = sqlite3.Row
     return conexion
 
@@ -31,6 +32,7 @@ def construir_clausula(columna_principal):
     La columna que el usuario eligio se pone al frente,
     y detras van las 8 reglas en su orden normal.
     """
+    # Si la columna son grandes, por defecto ordena de mayor a menor, de lo contrario de menor a mayor
     orden = "DESC" if columna_principal in ['streams_anuales', 'premios_grammy'] else "ASC"
 
     reglas_base = [
@@ -46,10 +48,10 @@ def construir_clausula(columna_principal):
     ]
 
     # Quitamos reglas repetidas (si la columna elegida ya esta en la lista)
-    cascada_final = []
-    for regla in reglas_base:
-        nombre_columna = regla.split()[0]
-        if nombre_columna not in [r.split()[0] for r in cascada_final]:
+    cascada_final = [] # aqui es donde guardamos las reglas que si sirven y no están repetidas
+    for regla in reglas_base: # revisa una por una 
+        nombre_columna = regla.split()[0] 
+        if nombre_columna not in [r.split()[0] for r in cascada_final]: 
             cascada_final.append(regla)
 
     return ", ".join(cascada_final)
@@ -94,15 +96,9 @@ class Index:
         conexion.commit()
         conexion.close()
 
-        # POST -> Redirect -> GET
-        # Usamos Location relativo en vez de web.seeother() porque en
-        # Codespaces seeother() arma la URL con el host interno (localhost)
-        # y eso rompe el redirect. Con '/' relativo, el navegador lo resuelve
-        # contra el dominio publico que ya esta usando.
         web.header('Location', '/')
         web.ctx.status = '303 See Other'
         return ''
-
 
 class Borrar:
     def GET(self, id_artista):

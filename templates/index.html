@@ -8,10 +8,9 @@ $def with (artistas, query_usada)
 </head>
 <body>
 
-    <h1>Reglas de Tabulacion</h1>
     <hr>
 
-    <h2>Capturar nuevo artista</h2>
+    <h2>Agrega un nuevo artista</h2>
 
     <form method="POST" action="/">
         <table border="0" cellpadding="4">
@@ -22,13 +21,13 @@ $def with (artistas, query_usada)
                 <td><input type="text" name="pais" required></td>
             </tr>
             <tr>
-                <td><label>Genero:</label></td>
+                <td><label>Género:</label></td>
                 <td><input type="text" name="genero" required></td>
                 <td><label>Streams (M):</label></td>
                 <td><input type="number" name="streams_anuales" required></td>
             </tr>
             <tr>
-                <td><label>Ano debut:</label></td>
+                <td><label>Año debut:</label></td>
                 <td><input type="number" name="ano_debut" required></td>
                 <td><label>Grammys:</label></td>
                 <td><input type="number" name="premios_grammy" required></td>
@@ -50,10 +49,10 @@ $def with (artistas, query_usada)
     <table border="1" cellpadding="6" cellspacing="0">
         <thead>
             <tr>
-                <th><a href="?sort=id">ID (orden ingreso)</a></th>
+                <th><a href="?sort=id">ID</a></th>
                 <th><a href="?sort=nombre">Nombre</a></th>
-                <th><a href="?sort=pais">Pais</a></th>
-                <th><a href="?sort=genero">Genero</a></th>
+                <th><a href="?sort=pais">País</a></th>
+                <th><a href="?sort=genero">Género</a></th>
                 <th><a href="?sort=streams_anuales">Streams</a></th>
                 <th><a href="?sort=ano_debut">Debut</a></th>
                 <th><a href="?sort=premios_grammy">Grammys</a></th>
@@ -77,7 +76,6 @@ $def with (artistas, query_usada)
         </tbody>
     </table>
 
-    <p>Total de artistas registrados: $len(artistas)</p>
 
 </body>
 </html>
