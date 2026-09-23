@@ -22,10 +22,9 @@ def crear_bd():
     # Reiniciamos el contador de IDs para que empiecen en 1
     cursor.execute("DELETE FROM sqlite_sequence WHERE name = 'artistas'")
 
-    # -----------------------------------------------------------
     # Artistas disenados para que cada regla se active en algun punto.
     # (nombre, pais, genero, streams, debut, grammys, ranking)
-    # -----------------------------------------------------------
+ 
     artistas_data = [
         # Regla 1: gana solo por tener mas streams que todos
         ('Taylor Swift',    'Estados Unidos', 'Pop',       20000, 2006, 14, 1),

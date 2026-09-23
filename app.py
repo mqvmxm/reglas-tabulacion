@@ -1,5 +1,5 @@
 import web
-import sqlite3
+import sqlite3 # importar para la base de datos
 
 urls = (   #Definición de las rutas del sistema
     '/', 'Index',
@@ -15,7 +15,7 @@ DB = 'artistas.db' # nombre de la base de datos
 
 def conectar():
     conexion = sqlite3.connect(DB) #establece y devuelve una conexión a la base de datos
-    conexion.row_factory = sqlite3.Row
+    conexion.row_factory = sqlite3.Row # sirve para devolver los registros como diccionarios y permite consultar cambios por su columna
     return conexion
 
 
@@ -115,4 +115,4 @@ class Borrar:
 
 
 if __name__ == "__main__": #verificamos que lo estemos corriendo directamente
-    app.run() # enciende el servidor web local
+    app.run() # enciende el servidor web local  
