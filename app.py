@@ -3,18 +3,18 @@ import sqlite3 # importar para la base de datos
 
 urls = (   #Definición de las rutas del sistema
     '/', 'Index',
-    r'/borrar/(\d+)', 'Borrar' # captura el ID para cuando se va a borrar
+    r'/borrar/(\d+)', 'Borrar' # r - texto crudo, d+ - cualquier numero, saber a que registro eliminar
 )
 
 # inicialización del sistema y plantillas 
-app = web.application(urls, globals())
-render = web.template.render('templates/')
+app = web.application(urls, globals()) # asocia rutas con las clases
+render = web.template.render('templates/') # direccion para el interfaz
 
 DB = 'artistas.db' # nombre de la base de datos 
 
 
 def conectar():
-    conexion = sqlite3.connect(DB) #establece y devuelve una conexión a la base de datos
+    conexion = sqlite3.connect(DB) #busca, establece y devuelve una conexión a la base de datos
     conexion.row_factory = sqlite3.Row # sirve para devolver los registros como diccionarios y permite consultar cambios por su columna
     return conexion
 
@@ -32,12 +32,12 @@ def construir_clausula(columna_principal):
     La columna que el usuario eligio se pone al frente,
     y detras van las 8 reglas en su orden normal.
     """
-    # Si la columna son grandes, por defecto ordena de mayor a menor, de lo contrario de menor a mayor
+    # numeros de mayor a menor y texto/años de menor a mayor, para llevar un orden e ir midiendo los datos
     orden = "DESC" if columna_principal in ['streams_anuales', 'premios_grammy'] else "ASC"
 
     reglas_base = [
-        f"{columna_principal} {orden}",
-        "streams_anuales DESC",    # Regla 1
+        f"{columna_principal} {orden}", # aqui posicionamos al regla elegida por el usuario
+        "streams_anuales DESC",    # Regla 1 
         "premios_grammy DESC",     # Regla 2
         "nombre ASC",              # Regla 3
         "ano_debut ASC",           # Regla 4
@@ -50,30 +50,31 @@ def construir_clausula(columna_principal):
     # Quitamos reglas repetidas (si la columna elegida ya esta en la lista)
     cascada_final = [] # aqui es donde guardamos las reglas que si sirven y no están repetidas
     for regla in reglas_base: # revisa una por una 
-        nombre_columna = regla.split()[0] 
-        if nombre_columna not in [r.split()[0] for r in cascada_final]: 
-            cascada_final.append(regla)
+        nombre_columna = regla.split()[0]  # extrae el nombre de la columna/regla
+        if nombre_columna not in [r.split()[0] for r in cascada_final]:  
+            cascada_final.append(regla) # guarda y agrega reglas no repetidas al final en una lista
 
-    return ", ".join(cascada_final) # al final lo que hace es no tener 2 reglas al mismo tiempo
+    return ", ".join(cascada_final) # convierte esa lista en texto para que SQL aplique la cascada
 
-#Es un controlador capturalo que el usario manda por la url y le asigna un id aleatorio. 
+# clase para la ruta principal y funcion que se ejecuta en automatico cuando alguien entra al sitio 
 class Index:
     def GET(self):
-        user_input = web.input(sort='id') # captura los parametros y se le define un valor por defecto para que al iniciar no existan fallos
-        columna_principal = user_input.sort
-#se valida la entrada y hace la consulta permitida
-        if columna_principal not in COLUMNAS_VALIDAS:
+        user_input = web.input(sort='id') # lee la URL para saber que columna solicitó el usuario
+        columna_principal = user_input.sort # extrae la columna y lo guarda en la variable
+
+# revisa que el nombre esté dentro de nuestra variable y sino sigue con id
+        if columna_principal not in COLUMNAS_VALIDAS: 
             columna_principal = 'id'
-#Reglas de negocio para el desempate 
-        clausula_sql = construir_clausula(columna_principal)
-        query = f"SELECT * FROM artistas ORDER BY {clausula_sql}"
-#Abre la conexion con bd, recupera los datos y cierra la conexion 
+
+        clausula_sql = construir_clausula(columna_principal) # le pasa la regla elegida y muestra los datos
+        query = f"SELECT * FROM artistas ORDER BY {clausula_sql}" # une la base de datos con la cascada, generando la consulta
+
         conexion = conectar()
-        cursor = conexion.cursor()
+        cursor = conexion.cursor() # conecta la base de datos y ejecuta nuestra consulta 
         cursor.execute(query)
-        artistas = cursor.fetchall()
+        artistas = cursor.fetchall() # extrae los datos devueltos y cierra conexion
         conexion.close()
-#Pasa los datos recuperados para la interfaz grafica
+#Pasa los datos recuperados para la interfaz
         return render.index(artistas=artistas, query_usada=query)
 
     def POST(self):
